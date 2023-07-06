@@ -661,6 +661,7 @@ function main() {
 
   log "Btrfs partition: ${btrfs_partition}"
   log "Btrfs partition UUID: ${btrfs_partition_uuid}"
+  log "Btrfs layout: ${btrfs_layout}"
   log "Btrfs mount options: ${btrfs_mount_options}"
   log "Btrfs original '/' subvolume: ${orig_root_subvolume}"
   log "Username: ${username}"
