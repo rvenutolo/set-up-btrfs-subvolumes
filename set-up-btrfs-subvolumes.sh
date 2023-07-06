@@ -63,7 +63,7 @@ readonly default_subvolumes=(
 )
 
 function log() {
-  echo -e "log: $*" >&2
+  echo -e "log [$(date +%T)]: $*" >&2
 }
 
 function die() {
