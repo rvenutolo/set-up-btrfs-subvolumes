@@ -1,5 +1,6 @@
 #!/usr/bin/env bash
 
+# TODO update these comments for new location
 # $ sudo bash -c "$(wget -qO- 'https://raw.githubusercontent.com/rvenutolo/scripts/main/setup/_post-install/set-up-btrfs-subvolumes.sh')"
 # $ sudo bash -c "$(curl -fsLS 'https://raw.githubusercontent.com/rvenutolo/scripts/main/setup/_post-install/set-up-btrfs-subvolumes.sh')"
 #
