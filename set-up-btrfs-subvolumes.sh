@@ -249,6 +249,7 @@ function create_btrfs_fs_mount() {
   fi
   for dir in '/dev' '/dev/pts' '/sys' '/sys/firmware/efi/efivars' '/proc' '/run'; do
     if [[ -d "${dir}" ]]; then
+      mkdir --parents "${fs_mount}${dir}"
       mount --bind "${dir}" "${fs_mount}${dir}"
     fi
   done
