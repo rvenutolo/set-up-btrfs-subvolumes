@@ -237,7 +237,7 @@ function get_existing_root_subvolume() {
   prompt_for_value "Btrfs '/' subvolume?" "${subvolume_best_guess}"
 }
 
-# $1 = root subvolume
+# $1 = root subvolume (may be empty)
 function create_btrfs_fs_mount() {
   if [[ "${btrfs_layout}" == 'nested' ]]; then
     die 'Nested subvolumes are not supported (yet)'
