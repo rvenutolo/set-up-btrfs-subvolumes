@@ -58,7 +58,7 @@ readonly default_subvolumes=(
   '~/.var @home-var'
   '~/Code @home-code'
   '~/Downloads @home-downloads'
-  '~/Phone @home-home'
+  '~/Phone @home-phone'
   '~/snap @home-snap'
   '~/Temp @home-temp'
 )
