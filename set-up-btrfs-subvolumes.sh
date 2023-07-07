@@ -242,7 +242,7 @@ function create_btrfs_fs_mount() {
   if [[ "${btrfs_layout}" == 'nested' ]]; then
     die 'Nested subvolumes are not supported (yet)'
   fi
-  if [[ "${btrfs_layout}" == 'none' ]]; then
+  if [[ -z "$1" ]]; then
     mount_btrfs_partition "${fs_mount}" 'subvolid=5'
   else
     mount_btrfs_partition "${fs_mount}" "subvol=$1"
@@ -477,6 +477,7 @@ function create_subvolumes() {
 function populate_subvolumes() {
   local line mount_point name chattr_modes
   log "Populating subvolumes"
+  prompt_yn 'Continue? -- Look at /tmp/id5_/'
   while read -r line; do
     IFS=' ' read -r mount_point name chattr_modes <<< "${line}"
     log "Moving files from: ${id5_mount}/${temp_all_files_dir}${mount_point} to: ${id5_mount}/${name}"
