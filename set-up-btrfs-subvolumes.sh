@@ -73,7 +73,7 @@ function die() {
 }
 
 if [[ "${EUID}" != 0 ]]; then
-  die "You need to run this script with root privileges."
+  die 'You need to run this script with root privileges.'
 fi
 
 # $1 = executable
@@ -138,7 +138,7 @@ function install_jq() {
     elif executable_exists 'zypper'; then
       zypper install --no-confirm 'jq'
     else
-      die "Could not find an expected package manager and cannot install jq."
+      die 'Could not find an expected package manager and cannot install jq.'
     fi
   fi
 }
@@ -211,7 +211,7 @@ function get_subvolume_from_mount_options() {
 
 function get_existing_root_subvolume() {
   local subvolume_best_guess fstab_to_read root_mount_options
-  log "Getting existing '/' subvolume"
+  log 'Getting existing '/' subvolume'
   if [[ "${btrfs_layout}" == 'nested' ]]; then
     die 'Nested subvolumes are not supported (yet)'
   fi
@@ -263,9 +263,9 @@ function check_os_id() {
     ubuntu | debian | fedora | pop) ;;
     *)
       log "Unsupported OS ID: ${os_id}. This script has not been tested on this OS."
-      log "This script will likely work, but this script will NOT attempt to update the bootloader if the '/' subvolume name has changed."
+      log 'This script will likely work, but this script will NOT attempt to update the bootloader if the '/' subvolume name has changed.'
       if ! prompt_yn 'Continue?'; then
-        die "Exiting."
+        die 'Exiting.'
       fi
       ;;
   esac
@@ -292,7 +292,7 @@ function destroy_btrfs_fs_mount() {
 function prepare_mounts_edit_file() {
   local btrfs_mounts_only_file subvolume mount_point name chattr_modes btrfs_mounts_edit_file
   btrfs_mounts_only_file="$(mktemp)"
-  echo "#<mount_point> <subvolume_name> <chattr_modes>" > "${btrfs_mounts_only_file}"
+  echo '#<mount_point> <subvolume_name> <chattr_modes>' > "${btrfs_mounts_only_file}"
   for subvolume in "${default_subvolumes[@]/'~'//home/${username}}"; do
     IFS=' ' read -r mount_point name chattr_modes <<< "${subvolume}"
     if [[ "${mount_point}" != '/' ]]; then
@@ -302,13 +302,13 @@ function prepare_mounts_edit_file() {
   done
   btrfs_mounts_edit_file="$(mktemp)"
   {
-    echo "# Edit this file to set desired Btrfs mounts. Save and exit to continue running the script."
-    echo "#"
-    echo "# <chattr_modes> is a comma-separated list of modes to apply to the dir at the mount point."
-    echo "# example: "
-    echo "#   /var/lib/libvirt/images @var-lib-libvirt-images +C,+m"
-    echo "#   would run chattr+C and chattr +m on /var/lib/libvirtd/images"
-    echo "#"
+    echo '# Edit this file to set desired Btrfs mounts. Save and exit to continue running the script.'
+    echo '#'
+    echo '# <chattr_modes> is a comma-separated list of modes to apply to the dir at the mount point.'
+    echo '# example:'
+    echo '#   /var/lib/libvirt/images @var-lib-libvirt-images +C,+m'
+    echo '#   would run chattr+C and chattr +m on /var/lib/libvirtd/images'
+    echo '#'
   } > "${btrfs_mounts_edit_file}"
   LC_ALL=C sort "${btrfs_mounts_only_file}" | column --table >> "${btrfs_mounts_edit_file}"
   echo "${btrfs_mounts_edit_file}"
@@ -344,7 +344,7 @@ function check_btrfs_mounts() {
 
 function move_all_files_to_top_level_subvolume() {
   local fstab_to_read fstab_line file_system mount_point type options dump pass subvolume_name
-  log "Moving all files to top-level subvolume"
+  log 'Moving all files to top-level subvolume'
   if [[ "${btrfs_layout}" == 'nested' ]]; then
     die 'Nested subvolumes are not supported (yet)'
   fi
@@ -380,11 +380,11 @@ function move_all_files_to_top_level_subvolume() {
 
 function write_new_fstab_file() {
   local fstab_file fstab_table_file line mount_point name chattr_modes
-  log "Writing new fstab file"
+  log 'Writing new fstab file'
   fstab_file="${id5_mount}/etc/fstab"
   cp "${fstab_file}" "${fstab_file}.orig"
   fstab_table_file="$(mktemp)"
-  echo "#<file_system> <mount_point> <type> <options> <dump> <pass>" > "${fstab_table_file}"
+  echo '#<file_system> <mount_point> <type> <options> <dump> <pass>' > "${fstab_table_file}"
   grep --invert-match --regexp='^\s*$' --regexp='^\s*#' --regexp "^\s*UUID=${btrfs_partition_uuid}" "${fstab_file}" >> "${fstab_table_file}"
   while read -r line; do
     IFS=' ' read -r mount_point name chattr_modes <<< "${line}"
@@ -404,8 +404,8 @@ function write_new_fstab_file() {
     fi
   done < "${btrfs_mounts_file}"
   {
-    echo "# /etc/fstab: static file system information."
-    echo "#"
+    echo '# /etc/fstab: static file system information.'
+    echo '#'
     column --table "${fstab_table_file}"
   } > "${fstab_file}"
 }
@@ -420,7 +420,7 @@ function move_all_files_into_top_level_tmpdir() {
 
 function create_dirs_for_mounts() {
   local line mount_point name chattr_modes octal_permissions owner_user_id owner_group_id set_perms_on existing_parent_dir get_perms_from
-  log "Creating directories for mounts"
+  log 'Creating directories for mounts'
   while read -r line; do
     IFS=' ' read -r mount_point name chattr_modes <<< "${line}"
     if [[ ! -d "${id5_mount}/${temp_all_files_dir}${mount_point}" ]]; then
@@ -448,7 +448,7 @@ function create_dirs_for_mounts() {
 
 function create_subvolumes() {
   local line mount_point name chattr_modes octal_permissions owner_user_id owner_group_id get_perms_from
-  log "Creating subvolumes"
+  log 'Creating subvolumes'
   while read -r line; do
     IFS=' ' read -r mount_point name chattr_modes <<< "${line}"
     log "Creating subvolume: ${name}"
@@ -476,8 +476,7 @@ function create_subvolumes() {
 
 function populate_subvolumes() {
   local line mount_point name chattr_modes
-  log "Populating subvolumes"
-  prompt_yn 'Continue? -- Look at /tmp/id5_/'
+  log 'Populating subvolumes'
   while read -r line; do
     IFS=' ' read -r mount_point name chattr_modes <<< "${line}"
     log "Moving files from: ${id5_mount}/${temp_all_files_dir}${mount_point} to: ${id5_mount}/${name}"
@@ -511,24 +510,24 @@ function update_debian_ubuntu_uefi_bootloader() {
 }
 
 function update_ubuntu_uefi_bootloader() {
-  log "Updating Ubuntu GRUB UEFI bootloader"
+  log 'Updating Ubuntu GRUB UEFI bootloader'
   update_debian_ubuntu_uefi_bootloader
 }
 
 function update_debian_uefi_bootloader() {
-  log "Updating Debian GRUB UEFI bootloader"
+  log 'Updating Debian GRUB UEFI bootloader'
   update_debian_ubuntu_uefi_bootloader
 }
 
 function update_fedora_uefi_bootloader() {
-  log "Updating Fedora GRUB UEFI bootloader"
+  log 'Updating Fedora GRUB UEFI bootloader'
   chroot "${fs_mount}" dnf reinstall --assumeyes 'grub2-efi' 'grub2-efi-modules' 'shim'
   chroot "${fs_mount}" grub2-mkconfig --output='/boot/grub2/grub.cfg'
 }
 
 function update_pop_uefi_bootloader() {
   local target_rootflags_option conf_file existing_options new_options kernelstub_conf_file existing_rootflags_option
-  log "Updating Pop OS systemd-boot UEFI bootloader"
+  log 'Updating Pop OS systemd-boot UEFI bootloader'
   install_jq
   target_rootflags_option="rootflags=subvol=${root_subvolume}"
   for conf_file in "${fs_mount}/boot/efi/loader/entries/"*'.conf'; do
@@ -565,17 +564,17 @@ function update_debian_ubuntu_bios_bootloader() {
 }
 
 function update_ubuntu_bios_bootloader() {
-  log "Updating Ubuntu GRUB BIOS bootloader"
+  log 'Updating Ubuntu GRUB BIOS bootloader'
   update_debian_ubuntu_bios_bootloader
 }
 
 function update_debian_bios_bootloader() {
-  log "Updating Debian GRUB BIOS bootloader"
+  log 'Updating Debian GRUB BIOS bootloader'
   update_debian_ubuntu_bios_bootloader
 }
 
 function update_fedora_bios_bootloader() {
-  log "Updating Fedora GRUB BIOS bootloader"
+  log 'Updating Fedora GRUB BIOS bootloader'
   chroot "${fs_mount}" grub2-mkconfig --output='/boot/grub2/grub.cfg'
 }
 
@@ -609,7 +608,7 @@ function update_bootloader() {
 
 function set_selinux_autorelabel() {
   echo '-F -M -T 0' > "${fs_mount}/.autorelabel"
-  log "SELinux will relabel files on next boot."
+  log 'SELinux will relabel files on next boot.'
 }
 
 function main() {
@@ -670,7 +669,7 @@ function main() {
   log "Btrfs mounts:\n$(cat "${btrfs_mounts_file}")"
 
   if ! prompt_yn 'Continue? (No changes have been applied)'; then
-    die "Exiting"
+    die 'Exiting'
   fi
 
   move_all_files_to_top_level_subvolume
